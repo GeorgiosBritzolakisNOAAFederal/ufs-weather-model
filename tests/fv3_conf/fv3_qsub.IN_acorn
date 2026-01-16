@@ -17,8 +17,10 @@ echo -n " $( date +%s )," >  job_timestamp.txt
 
 set +x
 module use $PWD/modulefiles
+module use /lfs/h1/emc/nems/noscrub/georgios.britzolakis/ProgramFiles/modulefiles
 module load modules.fv3
 module load cray-pals
+module load scalasca/scalasca_2.6.2_intel_19.1.3.304
 module list
 set -x
 
@@ -38,7 +40,8 @@ if [ "${JOB_SHOULD_FAIL:-NO}" = WHEN_RUNNING ] ; then
     false
 fi
 
-mpiexec -n @[TASKS] -ppn @[TPN] --cpu-bind core -depth @[THRD] ./fv3.exe
+scalasca --analyze mpiexec -n @[TASKS] -ppn @[TPN] --cpu-bind core -depth @[THRD] ./fv3.exe
+#mpiexec -n @[TASKS] -ppn @[TPN] --cpu-bind core -depth @[THRD] ./fv3.exe
 
 echo "Model ended:    " `date`
 echo -n " $( date +%s )," >> job_timestamp.txt
